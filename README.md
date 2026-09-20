@@ -4,20 +4,30 @@ TraceDrop is a lightweight developer observability tool for collecting applicati
 
 ## Development status
 
-The project is currently in active MVP development.
-
 Implemented:
-- Go API bootstrap and health endpoint;
+- Go API and health/readiness endpoints;
 - Next.js dashboard shell;
 - Docker development environment;
 - PostgreSQL schema and migrations;
-- pgx connection pool;
-- sqlc query definitions;
-- trace persistence repository;
-- PostgreSQL integration tests;
+- pgx/sqlc persistence;
+- trace repository and integration tests;
+- trace HTTP API with validation and lifecycle rules;
 - GitHub Actions CI.
 
-## Local database
+## Trace API
+
+```text
+POST /api/v1/traces
+GET  /api/v1/traces
+GET  /api/v1/traces/{traceId}
+POST /api/v1/traces/{traceId}/events
+POST /api/v1/traces/{traceId}/complete
+POST /api/v1/traces/{traceId}/fail
+```
+
+List traces accepts `status` and `limit` query parameters.
+
+## Local development
 
 Start PostgreSQL:
 
