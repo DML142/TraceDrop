@@ -51,8 +51,8 @@ GET /api/v1/metrics
 ## Development phases
 - [x] Phase 0: bootstrap Go API, Next.js web, Docker Compose, env example, README, CI skeleton, health endpoint.
 - [x] Phase 1: PostgreSQL, migrations, pgx/sqlc, repositories, integration tests.
-- [ ] Phase 2: trace API and domain rules. Current PR.
-- [ ] Phase 3: dashboard and filtering.
+- [x] Phase 2: trace API and domain rules.
+- [ ] Phase 3: dashboard and filtering. Current PR.
 - [ ] Phase 4: trace timeline.
 - [ ] Phase 5: simulator.
 - [ ] Phase 6: metrics.
