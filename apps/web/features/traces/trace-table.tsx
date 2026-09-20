@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import type { Trace } from "@/types/trace";
 
 function formatDuration(duration: number | null) {
@@ -38,8 +40,10 @@ export function TraceTable({ traces }: { traces: Trace[] }) {
           {traces.map((trace) => (
             <tr key={trace.id}>
               <td>
-                <div className="trace-name">{trace.name}</div>
-                <div className="trace-id">{trace.id}</div>
+                <Link className="trace-link" href={`/traces/${trace.id}`}>
+                  <div className="trace-name">{trace.name}</div>
+                  <div className="trace-id">{trace.id}</div>
+                </Link>
               </td>
               <td>
                 <span className={`status status-${trace.status}`}>{trace.status}</span>
