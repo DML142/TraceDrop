@@ -25,7 +25,16 @@ type CreateTraceParams struct {
 func (q *Queries) CreateTrace(ctx context.Context, arg CreateTraceParams) (Trace, error) {
 	row := q.db.QueryRow(ctx, createTrace, arg.Name, arg.Status, arg.Metadata)
 	var item Trace
-	err := row.Scan(&item.ID, &item.Name, &item.Status, &item.StartedAt, &item.FinishedAt, &item.DurationMs, &item.Metadata, &item.CreatedAt)
+	err := row.Scan(
+		&item.ID,
+		&item.Name,
+		&item.Status,
+		&item.StartedAt,
+		&item.FinishedAt,
+		&item.DurationMs,
+		&item.Metadata,
+		&item.CreatedAt,
+	)
 	return item, err
 }
 
@@ -38,7 +47,16 @@ WHERE id = $1
 func (q *Queries) GetTrace(ctx context.Context, id uuid.UUID) (Trace, error) {
 	row := q.db.QueryRow(ctx, getTrace, id)
 	var item Trace
-	err := row.Scan(&item.ID, &item.Name, &item.Status, &item.StartedAt, &item.FinishedAt, &item.DurationMs, &item.Metadata, &item.CreatedAt)
+	err := row.Scan(
+		&item.ID,
+		&item.Name,
+		&item.Status,
+		&item.StartedAt,
+		&item.FinishedAt,
+		&item.DurationMs,
+		&item.Metadata,
+		&item.CreatedAt,
+	)
 	return item, err
 }
 
@@ -51,12 +69,24 @@ LIMIT $1
 
 func (q *Queries) ListTraces(ctx context.Context, limit int32) ([]Trace, error) {
 	rows, err := q.db.Query(ctx, listTraces, limit)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
+
 	items := make([]Trace, 0)
 	for rows.Next() {
 		var item Trace
-		if err := rows.Scan(&item.ID, &item.Name, &item.Status, &item.StartedAt, &item.FinishedAt, &item.DurationMs, &item.Metadata, &item.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&item.ID,
+			&item.Name,
+			&item.Status,
+			&item.StartedAt,
+			&item.FinishedAt,
+			&item.DurationMs,
+			&item.Metadata,
+			&item.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, item)
@@ -79,12 +109,24 @@ type ListTracesByStatusParams struct {
 
 func (q *Queries) ListTracesByStatus(ctx context.Context, arg ListTracesByStatusParams) ([]Trace, error) {
 	rows, err := q.db.Query(ctx, listTracesByStatus, arg.Status, arg.Limit)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
+
 	items := make([]Trace, 0)
 	for rows.Next() {
 		var item Trace
-		if err := rows.Scan(&item.ID, &item.Name, &item.Status, &item.StartedAt, &item.FinishedAt, &item.DurationMs, &item.Metadata, &item.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&item.ID,
+			&item.Name,
+			&item.Status,
+			&item.StartedAt,
+			&item.FinishedAt,
+			&item.DurationMs,
+			&item.Metadata,
+			&item.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, item)
@@ -113,7 +155,16 @@ type TransitionTraceParams struct {
 func (q *Queries) TransitionTrace(ctx context.Context, arg TransitionTraceParams) (Trace, error) {
 	row := q.db.QueryRow(ctx, transitionTrace, arg.ID, arg.Status, arg.Status_2, arg.FinishedAt, arg.DurationMs)
 	var item Trace
-	err := row.Scan(&item.ID, &item.Name, &item.Status, &item.StartedAt, &item.FinishedAt, &item.DurationMs, &item.Metadata, &item.CreatedAt)
+	err := row.Scan(
+		&item.ID,
+		&item.Name,
+		&item.Status,
+		&item.StartedAt,
+		&item.FinishedAt,
+		&item.DurationMs,
+		&item.Metadata,
+		&item.CreatedAt,
+	)
 	return item, err
 }
 
@@ -134,7 +185,16 @@ type CreateTraceEventParams struct {
 func (q *Queries) CreateTraceEvent(ctx context.Context, arg CreateTraceEventParams) (TraceEvent, error) {
 	row := q.db.QueryRow(ctx, createTraceEvent, arg.TraceID, arg.EventType, arg.Message, arg.DurationMs, arg.Metadata)
 	var item TraceEvent
-	err := row.Scan(&item.ID, &item.TraceID, &item.EventType, &item.Message, &item.Timestamp, &item.DurationMs, &item.Metadata, &item.CreatedAt)
+	err := row.Scan(
+		&item.ID,
+		&item.TraceID,
+		&item.EventType,
+		&item.Message,
+		&item.Timestamp,
+		&item.DurationMs,
+		&item.Metadata,
+		&item.CreatedAt,
+	)
 	return item, err
 }
 
@@ -147,12 +207,24 @@ ORDER BY timestamp ASC, created_at ASC
 
 func (q *Queries) ListTraceEvents(ctx context.Context, traceID uuid.UUID) ([]TraceEvent, error) {
 	rows, err := q.db.Query(ctx, listTraceEvents, traceID)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 	defer rows.Close()
+
 	items := make([]TraceEvent, 0)
 	for rows.Next() {
 		var item TraceEvent
-		if err := rows.Scan(&item.ID, &item.TraceID, &item.EventType, &item.Message, &item.Timestamp, &item.DurationMs, &item.Metadata, &item.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&item.ID,
+			&item.TraceID,
+			&item.EventType,
+			&item.Message,
+			&item.Timestamp,
+			&item.DurationMs,
+			&item.Metadata,
+			&item.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, item)
