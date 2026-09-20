@@ -1,34 +1,45 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-)
 
-type healthResponse struct {
-	Status string `json:"status"`
-}
+	"github.com/DML142/TraceDrop/apps/api/internal/database"
+	"github.com/DML142/TraceDrop/apps/api/internal/database/db"
+	"github.com/DML142/TraceDrop/apps/api/internal/httpapi"
+	"github.com/DML142/TraceDrop/apps/api/internal/trace"
+)
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(healthResponse{Status: "ok"}); err != nil {
-			slog.Error("write health response", "error", err)
-		}
-	})
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		slog.Error("DATABASE_URL is required")
+		os.Exit(1)
+	}
+
+	ctx := context.Background()
+	pool, err := database.Open(ctx, databaseURL)
+	if err != nil {
+		slog.Error("open database", "error", err)
+		os.Exit(1)
+	}
+	defer pool.Close()
+
+	repository := trace.NewRepository(db.New(pool))
+	service := trace.NewService(repository)
+	api := httpapi.New(service, pool.Ping)
 
 	server := &http.Server{
 		Addr:              ":8080",
-		Handler:           mux,
+		Handler:           api.Handler(),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,
@@ -49,19 +60,9 @@ func main() {
 
 	slog.Info("api server stopping")
 
-	shutdownTimer := time.NewTimer(10 * time.Second)
-	defer shutdownTimer.Stop()
-
-	done := make(chan struct{})
-	go func() {
-		_ = server.Close()
-		close(done)
-	}()
-
-	select {
-	case <-done:
-		slog.Info("api server stopped")
-	case <-shutdownTimer.C:
-		slog.Warn("api shutdown timed out")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		slog.Warn("api shutdown failed", "error", err)
 	}
 }
