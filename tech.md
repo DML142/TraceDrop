@@ -14,50 +14,16 @@ MVP capabilities:
 - tests, Docker, CI/CD, preview deployments.
 
 ## Stack
-Backend: Go, net/http, chi, PostgreSQL, pgx, sqlc, goose, slog.
+Backend: Go, net/http, PostgreSQL, pgx, sqlc, goose, slog.
 Frontend: Next.js, TypeScript, App Router, Tailwind CSS, TanStack Query.
 Infra: Docker, Docker Compose, GitHub Actions, Vercel for web, managed API host and PostgreSQL.
-
-## Repository structure
-```
-apps/
-  api/
-  web/
-.github/workflows/
-docs/
-docker-compose.yml
-.env.example
-README.md
-AGENTS.md
-tech.md
-```
 
 ## Backend architecture
 HTTP -> Handler -> Service -> Repository -> PostgreSQL
 
 Handlers own transport concerns.
-Services own business rules.
+Services own business rules and state transitions.
 Repositories own persistence.
-
-## Core entities
-Trace:
-- id
-- name
-- status
-- started_at
-- finished_at
-- duration_ms
-- metadata
-- created_at
-
-TraceEvent:
-- id
-- trace_id
-- event_type
-- message
-- timestamp
-- duration_ms
-- metadata
 
 ## Trace statuses
 pending
@@ -65,11 +31,11 @@ running
 completed
 failed
 
-Valid transitions:
-pending -> running
+Current MVP transitions:
 running -> completed
 running -> failed
-failed -> running
+
+Retry transitions will be added with the simulator workflow.
 
 ## API surface
 GET /health
@@ -84,8 +50,8 @@ GET /api/v1/metrics
 
 ## Development phases
 - [x] Phase 0: bootstrap Go API, Next.js web, Docker Compose, env example, README, CI skeleton, health endpoint.
-- [ ] Phase 1: PostgreSQL, migrations, pgx/sqlc, repositories, integration tests. Current PR.
-- [ ] Phase 2: trace API and domain rules.
+- [x] Phase 1: PostgreSQL, migrations, pgx/sqlc, repositories, integration tests.
+- [ ] Phase 2: trace API and domain rules. Current PR.
 - [ ] Phase 3: dashboard and filtering.
 - [ ] Phase 4: trace timeline.
 - [ ] Phase 5: simulator.
@@ -95,17 +61,4 @@ GET /api/v1/metrics
 - [ ] Phase 9: deployment and previews.
 - [ ] Phase 10: portfolio polish and architecture docs.
 
-## MVP completion criteria
-- public frontend and API;
-- PostgreSQL persistence;
-- trace lifecycle and events;
-- timeline;
-- simulator;
-- metrics;
-- green CI;
-- automated tests;
-- preview deployments;
-- mobile usability;
-- clear README and architecture documentation.
-
-Do not expand scope before these are complete.
+Do not expand scope before the MVP phases are complete.

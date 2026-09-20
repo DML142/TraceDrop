@@ -42,7 +42,13 @@ jobs:
       - name: Run migrations
         run: goose -dir db/migrations postgres "$DATABASE_URL" up
       - name: Format check
-        run: test -z "$(gofmt -l .)"
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "Unformatted Go files:"
+            echo "$unformatted"
+            exit 1
+          fi
       - name: Vet
         run: go vet ./...
       - name: Test

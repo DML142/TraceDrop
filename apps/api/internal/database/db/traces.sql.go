@@ -5,6 +5,7 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -91,6 +92,80 @@ func (q *Queries) ListTraces(ctx context.Context, limit int32) ([]Trace, error) 
 		items = append(items, item)
 	}
 	return items, rows.Err()
+}
+
+const listTracesByStatus = `-- name: ListTracesByStatus :many
+SELECT id, name, status, started_at, finished_at, duration_ms, metadata, created_at
+FROM traces
+WHERE status = $1
+ORDER BY created_at DESC
+LIMIT $2
+`
+
+type ListTracesByStatusParams struct {
+	Status string `json:"status"`
+	Limit  int32  `json:"limit"`
+}
+
+func (q *Queries) ListTracesByStatus(ctx context.Context, arg ListTracesByStatusParams) ([]Trace, error) {
+	rows, err := q.db.Query(ctx, listTracesByStatus, arg.Status, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := make([]Trace, 0)
+	for rows.Next() {
+		var item Trace
+		if err := rows.Scan(
+			&item.ID,
+			&item.Name,
+			&item.Status,
+			&item.StartedAt,
+			&item.FinishedAt,
+			&item.DurationMs,
+			&item.Metadata,
+			&item.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, rows.Err()
+}
+
+const transitionTrace = `-- name: TransitionTrace :one
+UPDATE traces
+SET status = $3,
+    finished_at = $4,
+    duration_ms = $5
+WHERE id = $1
+  AND status = $2
+RETURNING id, name, status, started_at, finished_at, duration_ms, metadata, created_at
+`
+
+type TransitionTraceParams struct {
+	ID         uuid.UUID  `json:"id"`
+	Status     string     `json:"status"`
+	Status_2   string     `json:"status_2"`
+	FinishedAt *time.Time `json:"finished_at"`
+	DurationMs *int64     `json:"duration_ms"`
+}
+
+func (q *Queries) TransitionTrace(ctx context.Context, arg TransitionTraceParams) (Trace, error) {
+	row := q.db.QueryRow(ctx, transitionTrace, arg.ID, arg.Status, arg.Status_2, arg.FinishedAt, arg.DurationMs)
+	var item Trace
+	err := row.Scan(
+		&item.ID,
+		&item.Name,
+		&item.Status,
+		&item.StartedAt,
+		&item.FinishedAt,
+		&item.DurationMs,
+		&item.Metadata,
+		&item.CreatedAt,
+	)
+	return item, err
 }
 
 const createTraceEvent = `-- name: CreateTraceEvent :one
