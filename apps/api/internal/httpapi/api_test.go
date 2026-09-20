@@ -45,12 +45,12 @@ func (s stubService) Fail(ctx context.Context, id uuid.UUID) (db.Trace, error) {
 
 func defaultStub() stubService {
 	return stubService{
-		createFn: func(context.Context, trace.CreateInput) (db.Trace, error) { return db.Trace{}, nil },
-		getFn: func(context.Context, uuid.UUID) (trace.Detail, error) { return trace.Detail{}, nil },
-		listFn: func(context.Context, trace.ListInput) ([]db.Trace, error) { return nil, nil },
+		createFn:   func(context.Context, trace.CreateInput) (db.Trace, error) { return db.Trace{}, nil },
+		getFn:      func(context.Context, uuid.UUID) (trace.Detail, error) { return trace.Detail{}, nil },
+		listFn:     func(context.Context, trace.ListInput) ([]db.Trace, error) { return nil, nil },
 		addEventFn: func(context.Context, trace.AddEventInput) (db.TraceEvent, error) { return db.TraceEvent{}, nil },
 		completeFn: func(context.Context, uuid.UUID) (db.Trace, error) { return db.Trace{}, nil },
-		failFn: func(context.Context, uuid.UUID) (db.Trace, error) { return db.Trace{}, nil },
+		failFn:     func(context.Context, uuid.UUID) (db.Trace, error) { return db.Trace{}, nil },
 	}
 }
 
