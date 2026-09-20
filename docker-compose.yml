@@ -30,6 +30,7 @@ services:
     build:
       context: ./apps/web
     environment:
+      API_URL: http://api:8080
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     ports:
       - "${WEB_PORT:-3000}:3000"
