@@ -83,17 +83,17 @@ POST /api/v1/traces/{traceId}/fail
 GET /api/v1/metrics
 
 ## Development phases
-Phase 0: bootstrap Go API, Next.js web, Docker Compose, env example, README, CI skeleton, health endpoint.
-Phase 1: PostgreSQL, migrations, pgx/sqlc, repositories, integration tests.
-Phase 2: trace API and domain rules.
-Phase 3: dashboard and filtering.
-Phase 4: trace timeline.
-Phase 5: simulator.
-Phase 6: metrics.
-Phase 7: production hardening.
-Phase 8: full automated test coverage.
-Phase 9: deployment and previews.
-Phase 10: portfolio polish and architecture docs.
+- [x] Phase 0: bootstrap Go API, Next.js web, Docker Compose, env example, README, CI skeleton, health endpoint.
+- [ ] Phase 1: PostgreSQL, migrations, pgx/sqlc, repositories, integration tests. Current PR.
+- [ ] Phase 2: trace API and domain rules.
+- [ ] Phase 3: dashboard and filtering.
+- [ ] Phase 4: trace timeline.
+- [ ] Phase 5: simulator.
+- [ ] Phase 6: metrics.
+- [ ] Phase 7: production hardening.
+- [ ] Phase 8: full automated test coverage.
+- [ ] Phase 9: deployment and previews.
+- [ ] Phase 10: portfolio polish and architecture docs.
 
 ## MVP completion criteria
 - public frontend and API;

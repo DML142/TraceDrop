@@ -7,6 +7,22 @@ on:
 jobs:
   api:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: tracedrop
+          POSTGRES_USER: tracedrop
+          POSTGRES_PASSWORD: tracedrop
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tracedrop -d tracedrop"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+    env:
+      DATABASE_URL: postgres://tracedrop:tracedrop@localhost:5432/tracedrop?sslmode=disable
     defaults:
       run:
         working-directory: apps/api
@@ -15,6 +31,16 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: apps/api/go.mod
+      - name: Resolve dependencies
+        run: go mod tidy
+      - name: Install database tooling
+        run: |
+          go install github.com/pressly/goose/v3/cmd/goose@v3.28.0
+          go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.31.1
+      - name: Validate SQL
+        run: sqlc compile
+      - name: Run migrations
+        run: goose -dir db/migrations postgres "$DATABASE_URL" up
       - name: Format check
         run: test -z "$(gofmt -l .)"
       - name: Vet
