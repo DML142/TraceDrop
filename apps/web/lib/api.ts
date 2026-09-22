@@ -1,4 +1,4 @@
-import type { TraceListResponse, TraceStatus } from "@/types/trace";
+import type { TraceDetailResponse, TraceListResponse, TraceStatus } from "@/types/trace";
 
 export async function getTraces(status?: TraceStatus): Promise<TraceListResponse> {
   const params = new URLSearchParams();
@@ -15,4 +15,16 @@ export async function getTraces(status?: TraceStatus): Promise<TraceListResponse
   }
 
   return response.json() as Promise<TraceListResponse>;
+}
+
+export async function getTrace(traceId: string): Promise<TraceDetailResponse> {
+  const response = await fetch(`/api/traces/${encodeURIComponent(traceId)}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load trace");
+  }
+
+  return response.json() as Promise<TraceDetailResponse>;
 }

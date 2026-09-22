@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from "next/server";
+
+const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ traceId: string }> },
+) {
+  const { traceId } = await params;
+  const upstream = new URL(`/api/v1/traces/${encodeURIComponent(traceId)}`, apiUrl);
+
+  try {
+    const response = await fetch(upstream, {
+      cache: "no-store",
+    });
+
+    const body = await response.text();
+
+    return new NextResponse(body, {
+      status: response.status,
+      headers: {
+        "content-type": response.headers.get("content-type") ?? "application/json",
+      },
+    });
+  } catch {
+    return NextResponse.json(
+      {
+        error: {
+          code: "api_unavailable",
+          message: "Trace API is unavailable",
+        },
+      },
+      { status: 502 },
+    );
+  }
+}
